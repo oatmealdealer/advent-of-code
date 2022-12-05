@@ -31,17 +31,17 @@ impl From<&str> for Throw {
 impl Ord for Throw {
     fn cmp(&self, other: &Self) -> Ordering {
         match *self {
-            Self::Rock => match *other {
+            Self::Rock => match other {
                 Self::Rock => Ordering::Equal,
                 Self::Paper => Ordering::Less,
                 Self::Scissors => Ordering::Greater,
             },
-            Self::Paper => match *other {
+            Self::Paper => match other {
                 Self::Rock => Ordering::Greater,
                 Self::Paper => Ordering::Equal,
                 Self::Scissors => Ordering::Less,
             },
-            Self::Scissors => match *other {
+            Self::Scissors => match other {
                 Self::Rock => Ordering::Less,
                 Self::Paper => Ordering::Greater,
                 Self::Scissors => Ordering::Equal,
