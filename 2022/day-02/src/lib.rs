@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Clone, Copy)]
 pub enum Throw {
     Rock,
     Paper,
@@ -23,12 +23,7 @@ impl From<&str> for Throw {
             "A" => Self::Rock,
             "B" => Self::Paper,
             "C" => Self::Scissors,
-            "X" => Self::Rock,
-            "Y" => Self::Paper,
-            "Z" => Self::Scissors,
-            _ => {
-                unreachable!()
-            }
+            _ => unreachable!()
         }
     }
 }
@@ -63,6 +58,43 @@ impl PartialOrd for Throw {
 
 pub struct Match(Throw, Throw);
 
+pub enum Outcome {
+    Win,
+    Loss,
+    Draw
+}
+
+impl Outcome {
+    pub fn throw_for(&self, throw: &Throw) -> Throw {
+        match self {
+            Self::Win => match throw {
+                Throw::Rock => Throw::Paper,
+                Throw::Paper => Throw::Scissors,
+                Throw::Scissors => Throw::Rock
+
+            },
+            Self::Loss => match throw {
+                Throw::Rock => Throw::Scissors,
+                Throw::Paper => Throw::Rock,
+                Throw::Scissors => Throw::Paper
+
+            },
+            Self::Draw => *throw
+        }
+    }
+}
+
+impl From<&str> for Outcome {
+    fn from(letter: &str) -> Self {
+        match letter {
+            "X" => Self::Loss,
+            "Y" => Self::Draw,
+            "Z" => Self::Win,
+            _ => unreachable!()
+        }
+    }
+}
+
 impl Match {
     pub fn score(&self) -> u32 {
         self.1.base_score()
@@ -80,6 +112,20 @@ pub fn process_part1(input: &str) -> String {
         .map(|line| {
             let mut letters = line.split(" ");
             let parsed_match = Match(letters.next().unwrap().into(), letters.next().unwrap().into());
+            parsed_match.score()
+        })
+        .sum::<u32>()
+        .to_string()
+}
+
+pub fn process_part2(input: &str) -> String {
+    input
+        .lines()
+        .map(|line| {
+            let mut letters = line.split(" ");
+            let opponent_throw = Throw::from(letters.next().unwrap());
+            let desired_throw = Outcome::from(letters.next().unwrap()).throw_for(&opponent_throw);
+            let parsed_match = Match(opponent_throw, desired_throw);
             parsed_match.score()
         })
         .sum::<u32>()
